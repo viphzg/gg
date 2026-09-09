@@ -1,6 +1,6 @@
 // ==MiruExtension==
 // @name        HZG 点播
-// @version     1.1.0
+// @version     1.1.1
 // @author      HZG
 // @lang        all
 // @license     AGPL-3.0
@@ -199,15 +199,21 @@ export default class Vod extends Extension {
       }));
   }
 
-  // 首页：所有站点最新内容聚合
+  // 首页：所有站点最新内容聚合；全部失败时抛出原因
   async latest(page) {
     const sites = await this._loadSites();
     const out = [];
+    const errs = [];
     for (const site of sites) {
       try {
         const l = await this._listPage(site, 'pg=' + page);
         for (const it of l) out.push(it);
-      } catch (e) {}
+      } catch (e) {
+        errs.push(site.name + ': ' + e.message);
+      }
+    }
+    if (!out.length && errs.length) {
+      throw new Error('所有数据源都获取不到内容：' + errs.join(' | '));
     }
     return out;
   }
@@ -238,12 +244,18 @@ export default class Vod extends Extension {
     const sites = await this._loadSites();
     const out = [];
     const kwStr = String(kw || '').trim();
+    const errs = [];
     if (kwStr) {
       for (const site of sites) {
         try {
           const l = await this._listPage(site, 'wd=' + encodeURIComponent(kwStr) + '&pg=' + page);
           for (const it of l) out.push(it);
-        } catch (e) {}
+        } catch (e) {
+          errs.push(site.name + ': ' + e.message);
+        }
+      }
+      if (!out.length && errs.length) {
+        throw new Error('搜索失败：' + errs.join(' | '));
       }
       return out;
     }
