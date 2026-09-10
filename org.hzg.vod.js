@@ -17,7 +17,7 @@ export default class Vod extends Extension {
   async load() {
     this.registerSetting({
       key: 'api',
-      title: '数据源地址',
+      title: 'https://cj.lziapi.com/api.php/provide/vod/from/lzm3u8/at/xml/',
       type: 'input',
       defaultValue: '',
       description: '点播接口地址，支持多行（每行一个）：可直接填根域名、.json 配置地址、或影视 API 地址（JSON/XML 均可，如 .../api.php/provide/vod/from/lzm3u8/at/xml/）',
